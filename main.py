@@ -1,71 +1,64 @@
-from threading import Thread
+import random
 from time import sleep
-from tkinter import *
-from tkinter.ttk import Progressbar
-import os
-
-stopThread = False
-startThread = False
+import threading
+memory = []
+stop_reading_data = False
+stop_odd_numbers = False
 
 
-def process(pb, max_value, time):
-    pb.configure(maximum=max_value)
-    for i in range(max_value + 1):
-        pb.configure(value=i)
-        sleep(time)
-        pb.update()
-        while stopThread:
-            pass
+def reading_data():
+    global memory
+    global stop_reading_data
+    f_1 = open('1.txt', 'r')
+    str_one = f_1.read().split(',')
+    for a in str_one:
+        memory.append(eval(a))
+    stop_reading_data = True
 
 
-def start():
-    global startThread
-    global stopThread
-
-    if stopThread:
-        stopThread = False
-    if not startThread:
-        th1 = Thread(target=process, args=(pb1, 120, 0.03))
-        th1.start()
-        th2 = Thread(target=process, args=(pb2, 100, 0.05))
-        th2.start()
-
-    startThread = True
+def odd_numbers():
+    global stop_reading_data
+    global memory
+    global stop_odd_numbers
 
 
-def stop():
-    global stopThread
-    stopThread = True
+    while not stop_reading_data:
+        pass
+
+    print('Нечетные числа')
+
+    for a in memory:
+        if a % 2 != 0:
+            print(a)
+    stop_odd_numbers = True
 
 
-w1 = Tk()
-w1.title(" Потоки ")
-w1.geometry("250x150")
-w1.resizable(False, False)
+def max_min_average():
+    global stop_reading_data
+    global memory
+    global stop_odd_numbers
 
-# кнопка Старт
-btn1 = Button(w1, text="Старт", command=start)
-btn1.place(x=190, y=20, width=55, height=22)
+    while not stop_reading_data:
+        pass
 
-# кнопка Стоп
-btn2 = Button(w1, text="Стоп", command=stop)
-btn2.place(x=190, y=47, width=55, height=22)
+    average = 0
 
-# кнопка Закрыть
-btn3 = Button(w1, text="Закрыть", command=w1.destroy)
-btn3.place(x=190, y=74, width=55, height=22)
+    #sum
+    for i in memory:
+        average += i
 
-# Метки
-lbl1 = Label(w1, text="Поток №1")
-lbl1.place(x=15, y=5)
-lbl2 = Label(w1, text="Поток №2")
-lbl2.place(x=15, y=54)
+    average = average / len(memory)
+    while not stop_odd_numbers:
+        pass
+    print("Max = ", max(memory))
+    print("Min = ", min(memory))
+    print("Average = ", average)
 
-# Прогрессбар
-pb1 = Progressbar(w1, orient=HORIZONTAL, mode="determinate")
-pb1.place(x=15, y=30, width=150, height=22)
-pb2 = Progressbar(w1, orient=HORIZONTAL, mode="determinate")
-pb2.place(x=15, y=74, width=150, height=22)
 
-w1.mainloop()
-os.abort()
+th_1 = threading.Thread(target=reading_data, )
+th_2 = threading.Thread(target=odd_numbers, )
+th_3 = threading.Thread(target=max_min_average, )
+
+th_1.start()
+th_2.start()
+th_3.start()
